@@ -1,2 +1,0 @@
-# VanillaRegister
-Created with CodeSandbox

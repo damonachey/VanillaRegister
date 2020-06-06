@@ -1,0 +1,59 @@
+.flex-container {
+  display: flex;
+}
+
+.accounts {
+  padding: 10px 20px 0px 0px;
+}
+
+.accountList {
+  list-style-type: none;
+  padding: 0;
+  color: #4f81bd;
+  cursor: pointer;
+}
+
+.accountList li {
+  padding-bottom: 5px;
+  white-space: nowrap;
+}
+
+.accountList li[selected="true"] {
+  font-weight: bold;
+}
+
+.transactions {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid grey;
+}
+
+.transactionList {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactionList th,
+.transactionList td {
+  padding: 5px;
+  border: 1px solid #95b3d7;
+}
+
+.transactionList thead,
+.transactionList tfoot {
+  color: #fff;
+  background: #4f81bd;
+  text-align: left;
+}
+
+.transactionList tbody tr {
+  /* border-bottom: 1px solid #95b3d7; */
+}
+
+.transactionList tr:nth-child(even) td {
+  background: #dbe5f0;
+}
+
+a {
+  text-decoration: none;
+}
