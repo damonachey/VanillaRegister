@@ -22,6 +22,12 @@ export const View = {
 const columns = [];
 
 function initializeColumns(data) {
+  var formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  });
+
+  formatter.format(2500);
   columns.push({ name: "Date", field: "date", getValue: d => d });
   columns.push({
     name: "Payee",
@@ -34,7 +40,11 @@ function initializeColumns(data) {
     field: "categoryId",
     getValue: id => data.categories.find(category => category.id === id).name
   });
-  columns.push({ name: "Amount", field: "amount", getValue: a => a });
+  columns.push({
+    name: "Amount",
+    field: "amount",
+    getValue: a => formatter.format(a)
+  });
   columns.push({ name: "Balance", getValue: () => "" });
   columns.push({ name: "Notes", field: "notes", getValue: n => n });
 }
@@ -134,6 +144,7 @@ function getTableBody(data) {
       const td = document.createElement("td");
       const value = column.getValue(transaction[column.field]);
       td.textContent = `${value || ""}`;
+      td.setAttribute("name", column.name);
       tr.appendChild(td);
     }
 

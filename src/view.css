@@ -46,8 +46,9 @@
   text-align: left;
 }
 
-.transactionList tbody tr {
-  /* border-bottom: 1px solid #95b3d7; */
+.transactionList tbody tr td[name="Amount"],
+.transactionList tbody tr td[name="Balance"] {
+  text-align: right;
 }
 
 .transactionList tr:nth-child(even) td {
