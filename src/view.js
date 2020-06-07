@@ -128,6 +128,7 @@ function InitializeEdit(data) {
 
       if (!isClickInside) {
         if (saveTransaction()) {
+          data.save();
           View.display(data);
         }
       }

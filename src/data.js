@@ -13,12 +13,14 @@ export const Data = {
 
     this.transactions = [];
     this.transactions.id = -1;
+
+    this.load();
   },
 
   newTransaction(accountName, date, payeeName, categoryName, amount, notes) {
-    const account = findOrCreate(this.accounts, accountName);
-    const category = findOrCreate(this.categories, categoryName);
-    const payee = findOrCreate(this.payees, payeeName);
+    const account = this.findOrCreate(this.accounts, accountName);
+    const category = this.findOrCreate(this.categories, categoryName);
+    const payee = this.findOrCreate(this.payees, payeeName);
 
     const transaction = {
       id: ++this.transactions.id,
@@ -36,63 +38,43 @@ export const Data = {
   },
 
   findOrCreate(collection, name) {
-    return findOrCreate(collection, name);
+    let item = collection.find(itm => itm.name === name);
+
+    if (!item) {
+      item = { id: ++collection.id, name };
+      collection.push(item);
+    }
+
+    return item;
   },
 
-  loadTestData() {
-    this.newTransaction(
-      "Checking",
-      "2020-06-07",
-      "Amazon",
-      "Household",
-      -21,
-      "Refund for lamp"
-    );
-    this.newTransaction("Checking", "2020-06-01", "Bob", "Rent", 600, "June");
-    this.newTransaction(
-      "Checking",
-      "2020-06-06",
-      "Colorado Springs Utilities",
-      "Utilities",
-      123.45,
-      "May"
-    );
-    this.newTransaction(
-      "Checking",
-      "2020-06-16",
-      "Credit Card",
-      "Transfer",
-      22.34
-    );
+  save() {
+    localStorage.setItem("accounts", JSON.stringify(this.accounts));
+    localStorage.setItem("categories", JSON.stringify(this.categories));
+    localStorage.setItem("payees", JSON.stringify(this.payees));
+    localStorage.setItem("transactions", JSON.stringify(this.transactions));
+    localStorage.setItem("currentAccountId", this.currentAccountId);
+  },
 
-    this.newTransaction(
-      "Credit Card",
-      "2020-06-05",
-      "Subway",
-      "Dining",
-      12.34,
-      "Turkey sub"
-    );
-    this.newTransaction(
-      "Credit Card",
-      "2020-06-16",
-      "Sue",
-      "Gas",
-      10,
-      "Road trip"
-    );
+  load() {
+    function loadJSON(collectionName, data) {
+      const json = localStorage.getItem(collectionName);
 
-    this.currentAccountId = 0;
+      if (json) {
+        data[collectionName] = JSON.parse(json);
+        data[collectionName].id = Math.max(
+          ...data[collectionName].map(item => item.id)
+        );
+      }
+    }
+
+    loadJSON("accounts", this);
+    loadJSON("categories", this);
+    loadJSON("payees", this);
+    loadJSON("transactions", this);
+    this.currentAccountId = parseInt(
+      localStorage.getItem("currentAccountId"),
+      10
+    );
   }
 };
-
-function findOrCreate(collection, name) {
-  let item = collection.find(itm => itm.name === name);
-
-  if (!item) {
-    item = { id: ++collection.id, name };
-    collection.push(item);
-  }
-
-  return item;
-}
