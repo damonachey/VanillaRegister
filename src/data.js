@@ -35,6 +35,10 @@ export const Data = {
     return transaction;
   },
 
+  findOrCreate(collection, name) {
+    return findOrCreate(collection, name);
+  },
+
   loadTestData() {
     this.newTransaction(
       "Checking",

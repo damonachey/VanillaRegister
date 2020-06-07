@@ -10,7 +10,6 @@
   list-style-type: none;
   padding: 0;
   color: #4f81bd;
-  cursor: pointer;
 }
 
 .accountList li {
@@ -51,12 +50,20 @@
   text-align: right;
 }
 
-.transactionList .clickable {
+.clickable {
   cursor: pointer;
 }
 
-.transactionList tr:nth-child(even) td {
+.transactionList tr:nth-child(even) {
   background: #dbe5f0;
+}
+
+.editing {
+  background: #ffff66;
+}
+
+.error {
+  background: #ff6666;
 }
 
 a {

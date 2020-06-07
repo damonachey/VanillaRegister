@@ -12,6 +12,7 @@ export const View = {
 
     initializeColumns(data);
     initializeSortFunctions(data);
+    InitializeEdit(data);
   },
 
   display(data) {
@@ -24,7 +25,9 @@ const columns = [];
 
 function initializeColumns(data) {
   var currency = new Intl.NumberFormat("en-US", {
-    style: "currency",
+    //style: "currency",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
     currency: "USD"
   });
 
@@ -32,31 +35,58 @@ function initializeColumns(data) {
     name: "Date",
     property: "date",
     getValue: d => d,
-    sortable: true
+    setValue: d => d,
+    validate: d => {
+      const match = d.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
+
+      if (!match) return false;
+
+      const year = parseInt(match.groups["year"], 10);
+      const month = parseInt(match.groups["month"], 10);
+      const day = parseInt(match.groups["day"], 10);
+
+      if (year < 2000 || year > 2999) return false;
+      if (month < 1 || month > 12) return false;
+      if (day < 1 || day > 31) return false;
+
+      return true;
+    },
+    sortable: true,
+    editable: true
   });
   columns.push({
     name: "Payee",
     property: "payeeId",
     getValue: id => data.payees.find(payee => payee.id === id).name,
-    sortable: true
+    setValue: name => data.findOrCreate(data.payees, name).id,
+    sortable: true,
+    editable: true
   });
   columns.push({
     name: "Status",
     property: "status",
     getValue: s => s,
-    sortable: true
+    setValue: s => s,
+    validate: s => true,
+    sortable: true,
+    editable: true
   });
   columns.push({
     name: "Category",
     property: "categoryId",
     getValue: id => data.categories.find(category => category.id === id).name,
-    sortable: true
+    setValue: name => data.findOrCreate(data.categories, name).id,
+    sortable: true,
+    editable: true
   });
   columns.push({
     name: "Amount",
     property: "amount",
     getValue: a => currency.format(a),
-    sortable: true
+    setValue: a => +a,
+    validate: a => !isNaN(a),
+    sortable: true,
+    editable: true
   });
   columns.push({
     name: "Balance",
@@ -67,7 +97,9 @@ function initializeColumns(data) {
     name: "Notes",
     property: "notes",
     getValue: n => n,
-    sortable: true
+    setValue: n => n,
+    sortable: true,
+    editable: true
   });
 }
 
@@ -87,6 +119,20 @@ function initializeSortFunctions(data) {
   };
 
   changeSortOrder("date");
+}
+
+function InitializeEdit(data) {
+  document.addEventListener("click", e => {
+    if (editing) {
+      const isClickInside = editing.row.contains(e.target);
+
+      if (!isClickInside) {
+        if (saveTransaction()) {
+          View.display(data);
+        }
+      }
+    }
+  });
 }
 
 function displayAccounts(data) {
@@ -114,6 +160,7 @@ function getAccountItem(data, account) {
   const accountItem = document.createElement("li");
   accountItem.textContent = account.name;
   accountItem.setAttribute("selected", data.currentAccountId === account.id);
+  accountItem.classList.add("clickable");
   accountItem.onclick = () => {
     data.currentAccountId = account.id;
     View.display(data);
@@ -205,13 +252,19 @@ function getTableBody(data) {
     transaction.balance = balance;
 
     const tr = document.createElement("tr");
-    tr.ondblclick = () => editTransaction(transaction.id);
+    tr.ondblclick = () => editTransaction(tr, transaction);
 
     for (const column of columns) {
       const td = document.createElement("td");
       const value = column.getValue(transaction[column.property]);
       td.textContent = `${value || ""}`;
       td.setAttribute("name", column.name);
+      td.setAttribute("property", column.property);
+
+      if (column.editable) {
+        td.classList.add("editable");
+      }
+
       tr.appendChild(td);
     }
 
@@ -235,6 +288,60 @@ function getTableFooter() {
   return tfoot;
 }
 
-function editTransaction(id) {
-  console.log("edit", id);
+let editing;
+
+function editTransaction(row, transaction) {
+  if (editing) return;
+
+  console.log("edit", transaction.id);
+
+  editing = { row, transaction };
+
+  for (const child of row.children) {
+    if (child.classList.contains("editable")) {
+      child.setAttribute("contenteditable", true);
+      child.classList.add("editing");
+    }
+  }
+}
+
+function saveTransaction() {
+  if (!editing) return false;
+
+  let errors = false;
+
+  for (const child of editing.row.children) {
+    child.classList.remove("error");
+
+    if (child.classList.contains("editable")) {
+      const property = child.getAttribute("property");
+      const column = columns.find(c => c.property === property);
+
+      if (column.validate) {
+        const valid = column.validate(child.textContent);
+
+        if (!valid) {
+          errors = true;
+          child.classList.add("error");
+        }
+      }
+    }
+  }
+
+  if (errors) return false;
+
+  for (const child of editing.row.children) {
+    if (child.classList.contains("editable")) {
+      const property = child.getAttribute("property");
+      const column = columns.find(c => c.property === property);
+      editing.transaction[property] = column.setValue(child.textContent);
+
+      child.setAttribute("contenteditable", false);
+      child.classList.remove("editing");
+    }
+  }
+
+  editing = undefined;
+
+  return true;
 }
