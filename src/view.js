@@ -1,5 +1,7 @@
 import "./view.css";
 
+import { Utilities } from "./utilities";
+
 export const View = {
   initialize(name, data) {
     this.app = document.getElementById(name);
@@ -24,33 +26,12 @@ export const View = {
 const columns = [];
 
 function initializeColumns(data) {
-  var currency = new Intl.NumberFormat("en-US", {
-    //style: "currency",
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 2,
-    currency: "USD"
-  });
-
   columns.push({
     name: "Date",
     property: "date",
     getValue: d => d,
     setValue: d => d,
-    validate: d => {
-      const match = d.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
-
-      if (!match) return false;
-
-      const year = parseInt(match.groups["year"], 10);
-      const month = parseInt(match.groups["month"], 10);
-      const day = parseInt(match.groups["day"], 10);
-
-      if (year < 2000 || year > 2999) return false;
-      if (month < 1 || month > 12) return false;
-      if (day < 1 || day > 31) return false;
-
-      return true;
-    },
+    validate: d => Utilities.validateDate(d),
     sortable: true,
     editable: true
   });
@@ -82,7 +63,7 @@ function initializeColumns(data) {
   columns.push({
     name: "Amount",
     property: "amount",
-    getValue: a => currency.format(a),
+    getValue: a => Utilities.formatCurrency(a),
     setValue: a => +a,
     validate: a => !isNaN(a),
     sortable: true,
@@ -91,7 +72,7 @@ function initializeColumns(data) {
   columns.push({
     name: "Balance",
     property: "balance",
-    getValue: b => currency.format(b)
+    getValue: b => Utilities.formatCurrency(b)
   });
   columns.push({
     name: "Notes",
@@ -335,6 +316,7 @@ function saveTransaction() {
     if (child.classList.contains("editable")) {
       const property = child.getAttribute("property");
       const column = columns.find(c => c.property === property);
+
       editing.transaction[property] = column.setValue(child.textContent);
 
       child.setAttribute("contenteditable", false);
