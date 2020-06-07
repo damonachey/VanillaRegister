@@ -134,7 +134,7 @@ function displayTransactions(data) {
   displayTransactionsAccountName(data);
 
   const transactionList = document.getElementById("transactionList");
-  const tableHeader = getTableHeader(data);
+  const tableHeader = getTableHeader();
   const tableBody = getTableBody(data);
   const tableFooter = getTableFooter();
 
