@@ -33,12 +33,6 @@
   border-collapse: collapse;
 }
 
-.transactionList th,
-.transactionList td {
-  padding: 5px;
-  border: 1px solid #95b3d7;
-}
-
 .transactionList thead,
 .transactionList tfoot {
   color: #fff;
@@ -46,9 +40,19 @@
   text-align: left;
 }
 
-.transactionList tbody tr td[name="Amount"],
-.transactionList tbody tr td[name="Balance"] {
+.transactionList th,
+.transactionList td {
+  padding: 5px;
+  border: 1px solid #95b3d7;
+}
+
+.transactionList td[name="Amount"],
+.transactionList td[name="Balance"] {
   text-align: right;
+}
+
+.transactionList .clickable {
+  cursor: pointer;
 }
 
 .transactionList tr:nth-child(even) td {

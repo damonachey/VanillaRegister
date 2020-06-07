@@ -22,31 +22,52 @@ export const View = {
 const columns = [];
 
 function initializeColumns(data) {
-  var formatter = new Intl.NumberFormat("en-US", {
+  var currency = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
   });
 
-  formatter.format(2500);
-  columns.push({ name: "Date", field: "date", getValue: d => d });
+  columns.push({
+    name: "Date",
+    property: "date",
+    getValue: d => d,
+    sortable: true
+  });
   columns.push({
     name: "Payee",
-    field: "payeeId",
-    getValue: id => data.payees.find(payee => payee.id === id).name
+    property: "payeeId",
+    getValue: id => data.payees.find(payee => payee.id === id).name,
+    sortable: true
   });
-  columns.push({ name: "Status", field: "status", getValue: s => s });
+  columns.push({
+    name: "Status",
+    property: "status",
+    getValue: s => s,
+    sortable: true
+  });
   columns.push({
     name: "Category",
-    field: "categoryId",
-    getValue: id => data.categories.find(category => category.id === id).name
+    property: "categoryId",
+    getValue: id => data.categories.find(category => category.id === id).name,
+    sortable: true
   });
   columns.push({
     name: "Amount",
-    field: "amount",
-    getValue: a => formatter.format(a)
+    property: "amount",
+    getValue: a => currency.format(a),
+    sortable: true
   });
-  columns.push({ name: "Balance", getValue: () => "" });
-  columns.push({ name: "Notes", field: "notes", getValue: n => n });
+  columns.push({
+    name: "Balance",
+    property: "balance",
+    getValue: b => currency.format(b)
+  });
+  columns.push({
+    name: "Notes",
+    property: "notes",
+    getValue: n => n,
+    sortable: true
+  });
 }
 
 function displayAccounts(data) {
@@ -91,18 +112,16 @@ function displayTransactions(data) {
     </table>
   `;
 
-  const transactionList = document.getElementById("transactionList");
-  transactionList.innerHTML = "";
-
   displayTransactionsAccountName(data);
 
-  const tableHeader = getTableHeader();
-  transactionList.appendChild(tableHeader);
-
+  const transactionList = document.getElementById("transactionList");
+  const tableHeader = getTableHeader(data);
   const tableBody = getTableBody(data);
-  transactionList.appendChild(tableBody);
-
   const tableFooter = getTableFooter();
+
+  transactionList.innerHTML = "";
+  transactionList.appendChild(tableHeader);
+  transactionList.appendChild(tableBody);
   transactionList.appendChild(tableFooter);
 }
 
@@ -114,13 +133,44 @@ function displayTransactionsAccountName(data) {
   accountName.textContent = account ? account.name : "None";
 }
 
-function getTableHeader() {
+const propertyCompare = p => (a, b) => -(a[p] < b[p]) || +(a[p] > b[p]);
+const propertyCompareReverse = p => (b, a) => -(a[p] < b[p]) || +(a[p] > b[p]);
+let sortFunction = propertyCompare("date");
+
+function changeSortOrder(data, property, f) {
+  sortFunction = f(property);
+  View.display(data);
+}
+
+function getTableHeader(data) {
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");
 
   for (const column of columns) {
     const th = document.createElement("th");
-    th.textContent = column.name;
+    const div = document.createElement("div");
+    const text = document.createElement("span");
+    const down = document.createElement("span");
+    const up = document.createElement("span");
+
+    text.textContent = column.name;
+
+    if (column.sortable) {
+      down.textContent = "▼";
+      up.textContent = "▲";
+      down.classList.add("clickable");
+      up.classList.add("clickable");
+    }
+
+    down.onclick = () =>
+      changeSortOrder(data, column.property, propertyCompare);
+    up.onclick = () =>
+      changeSortOrder(data, column.property, propertyCompareReverse);
+
+    div.appendChild(text);
+    div.appendChild(down);
+    div.appendChild(up);
+    th.appendChild(div);
     thead.appendChild(th);
   }
 
@@ -132,17 +182,24 @@ function getTableHeader() {
 function getTableBody(data) {
   const tbody = document.createElement("tbody");
 
-  const transactions = data.transactions.filter(
-    transaction => transaction.accountId === data.currentAccountId
-  );
+  const currentAccount = transaction =>
+    transaction.accountId === data.currentAccountId;
+  const transactions = data.transactions.filter(currentAccount);
+
+  transactions.sort(sortFunction);
+
+  let balance = 0;
 
   for (const transaction of transactions) {
+    balance += transaction.amount;
+    transaction.balance = balance;
+
     const tr = document.createElement("tr");
     tr.ondblclick = () => editTransaction(transaction.id);
 
     for (const column of columns) {
       const td = document.createElement("td");
-      const value = column.getValue(transaction[column.field]);
+      const value = column.getValue(transaction[column.property]);
       td.textContent = `${value || ""}`;
       td.setAttribute("name", column.name);
       tr.appendChild(td);
@@ -159,7 +216,7 @@ function getTableFooter() {
   const tr = document.createElement("tr");
   const td = document.createElement("td");
 
-  td.textContent = `Footer`;
+  td.textContent = "";
   td.setAttribute("colspan", columns.length);
 
   tr.appendChild(td);

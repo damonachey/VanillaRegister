@@ -36,6 +36,14 @@ export const Data = {
   },
 
   loadTestData() {
+    this.newTransaction(
+      "Checking",
+      "2020-06-07",
+      "Amazon",
+      "Household",
+      -21,
+      "Refund for lamp"
+    );
     this.newTransaction("Checking", "2020-06-01", "Bob", "Rent", 600, "June");
     this.newTransaction(
       "Checking",
