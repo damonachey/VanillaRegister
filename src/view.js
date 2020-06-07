@@ -11,6 +11,7 @@ export const View = {
     `;
 
     initializeColumns(data);
+    initializeSortFunctions(data);
   },
 
   display(data) {
@@ -68,6 +69,24 @@ function initializeColumns(data) {
     getValue: n => n,
     sortable: true
   });
+}
+
+let sortFunction;
+let changeSortOrder;
+
+function initializeSortFunctions(data) {
+  const propertyCompare = p => (a, b) => -(a[p] < b[p]) || +(a[p] > b[p]);
+  const propertyCompareReverse = p => (b, a) =>
+    -(a[p] < b[p]) || +(a[p] > b[p]);
+
+  changeSortOrder = (property, forward = true) => {
+    sortFunction = forward
+      ? propertyCompare(property)
+      : propertyCompareReverse(property);
+    View.display(data);
+  };
+
+  changeSortOrder("date");
 }
 
 function displayAccounts(data) {
@@ -133,16 +152,7 @@ function displayTransactionsAccountName(data) {
   accountName.textContent = account ? account.name : "None";
 }
 
-const propertyCompare = p => (a, b) => -(a[p] < b[p]) || +(a[p] > b[p]);
-const propertyCompareReverse = p => (b, a) => -(a[p] < b[p]) || +(a[p] > b[p]);
-let sortFunction = propertyCompare("date");
-
-function changeSortOrder(data, property, f) {
-  sortFunction = f(property);
-  View.display(data);
-}
-
-function getTableHeader(data) {
+function getTableHeader() {
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");
 
@@ -150,26 +160,26 @@ function getTableHeader(data) {
     const th = document.createElement("th");
     const div = document.createElement("div");
     const text = document.createElement("span");
-    const down = document.createElement("span");
-    const up = document.createElement("span");
 
     text.textContent = column.name;
+    div.appendChild(text);
 
     if (column.sortable) {
+      const down = document.createElement("span");
+      const up = document.createElement("span");
+
       down.textContent = "▼";
       up.textContent = "▲";
       down.classList.add("clickable");
       up.classList.add("clickable");
+
+      down.onclick = () => changeSortOrder(column.property);
+      up.onclick = () => changeSortOrder(column.property, false);
+
+      div.appendChild(down);
+      div.appendChild(up);
     }
 
-    down.onclick = () =>
-      changeSortOrder(data, column.property, propertyCompare);
-    up.onclick = () =>
-      changeSortOrder(data, column.property, propertyCompareReverse);
-
-    div.appendChild(text);
-    div.appendChild(down);
-    div.appendChild(up);
     th.appendChild(div);
     thead.appendChild(th);
   }
