@@ -57,24 +57,29 @@ export const Data = {
   },
 
   load() {
-    function loadJSON(collectionName, data) {
-      const json = localStorage.getItem(collectionName);
+    const data = this;
+
+    function loadCollection(name) {
+      const json = localStorage.getItem(name);
 
       if (json) {
-        data[collectionName] = JSON.parse(json);
-        data[collectionName].id = Math.max(
-          ...data[collectionName].map(item => item.id)
-        );
+        data[name] = JSON.parse(json);
+        data[name].id = Math.max(...data[name].map(item => item.id));
       }
     }
 
-    loadJSON("accounts", this);
-    loadJSON("categories", this);
-    loadJSON("payees", this);
-    loadJSON("transactions", this);
-    this.currentAccountId = parseInt(
-      localStorage.getItem("currentAccountId"),
-      10
-    );
+    function loadInt(name) {
+      const value = localStorage.getItem(name);
+
+      if (value) {
+        data[name] = parseInt(value, 10);
+      }
+    }
+
+    loadCollection("accounts");
+    loadCollection("categories");
+    loadCollection("payees");
+    loadCollection("transactions");
+    loadInt("currentAccountId");
   }
 };
