@@ -40,8 +40,8 @@ export const Columns = {
       name: "Amount",
       property: "amount",
       getValue: a => Utilities.formatCurrency(a),
-      setValue: a => +a,
-      validate: a => !isNaN(a),
+      setValue: a => +a.replace(/,/, ""),
+      validate: a => !isNaN(+a.replace(/,/, "")),
       sortable: true,
       editable: true
     });

@@ -1,40 +1,32 @@
 export const Data = {
   initialize() {
-    this.currentAccountId = -1;
+    this.currentAccountId = 0;
 
-    this.accounts = [];
-    this.accounts.id = -1;
+    this.accounts = [{ id: 0, name: "Checking" }];
+    this.accounts.id = 0;
 
-    this.categories = [];
-    this.categories.id = -1;
+    this.categories = [{ id: 0, name: "" }];
+    this.categories.id = 0;
 
-    this.payees = [];
-    this.payees.id = -1;
+    this.payees = [{ id: 0, name: "" }];
+    this.payees.id = 0;
 
-    this.transactions = [];
-    this.transactions.id = -1;
-
-    this.load();
+    this.transactions = [{ id: 0, name: "" }];
+    this.transactions.id = 0;
   },
 
-  newTransaction(accountName, date, payeeName, categoryName, amount, notes) {
-    const account = this.findOrCreate(this.accounts, accountName);
-    const category = this.findOrCreate(this.categories, categoryName);
-    const payee = this.findOrCreate(this.payees, payeeName);
-
-    const transaction = {
-      id: ++this.transactions.id,
-      accountId: account.id,
-      date,
-      payeeId: payee.id,
-      categoryId: category.id,
-      amount,
-      notes
-    };
+  addTransaction(transaction) {
+    transaction.id = ++this.transactions.id;
 
     this.transactions.push(transaction);
+  },
 
-    return transaction;
+  deleteTransaction(transaction) {
+    const index = this.transactions
+      .map(item => item.id)
+      .indexOf(transaction.id);
+
+    this.transactions.splice(index, 1);
   },
 
   findOrCreate(collection, name) {
