@@ -105,7 +105,7 @@ function initializeSortFunctions(data) {
 function InitializeEdit(data) {
   document.addEventListener("click", e => {
     if (editing) {
-      const isClickInside = editing.row.contains(e.target);
+      const isClickInside = editing.tr.contains(e.target);
 
       if (!isClickInside) {
         if (saveTransaction()) {
@@ -272,14 +272,12 @@ function getTableFooter() {
 
 let editing;
 
-function editTransaction(row, transaction) {
+function editTransaction(tr, transaction) {
   if (editing) return;
 
-  console.log("edit", transaction.id);
+  editing = { tr, transaction };
 
-  editing = { row, transaction };
-
-  for (const child of row.children) {
+  for (const child of tr.children) {
     if (child.classList.contains("editable")) {
       child.setAttribute("contenteditable", true);
       child.classList.add("editing");
@@ -292,7 +290,7 @@ function saveTransaction() {
 
   let errors = false;
 
-  for (const child of editing.row.children) {
+  for (const child of editing.tr.children) {
     child.classList.remove("error");
 
     if (child.classList.contains("editable")) {
@@ -312,7 +310,7 @@ function saveTransaction() {
 
   if (errors) return false;
 
-  for (const child of editing.row.children) {
+  for (const child of editing.tr.children) {
     if (child.classList.contains("editable")) {
       const property = child.getAttribute("property");
       const column = columns.find(c => c.property === property);
