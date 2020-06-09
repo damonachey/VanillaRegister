@@ -108,10 +108,16 @@ function InitializeEdit(data) {
       const isClickInside = editing.tr.contains(e.target);
 
       if (!isClickInside) {
-        if (saveTransaction()) {
-          data.save();
-          View.display(data);
-        }
+        saveTransaction(data);
+      }
+    }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (editing) {
+      if (e.keyCode === 13) {
+        saveTransaction(data);
+        e.preventDefault();
       }
     }
   });
@@ -234,7 +240,6 @@ function getTableBody(data) {
     transaction.balance = balance;
 
     const tr = document.createElement("tr");
-    tr.ondblclick = () => editTransaction(tr, transaction);
 
     for (const column of columns) {
       const td = document.createElement("td");
@@ -245,6 +250,7 @@ function getTableBody(data) {
 
       if (column.editable) {
         td.classList.add("editable");
+        td.ondblclick = () => editTransaction(td, tr, transaction);
       }
 
       tr.appendChild(td);
@@ -272,7 +278,7 @@ function getTableFooter() {
 
 let editing;
 
-function editTransaction(tr, transaction) {
+function editTransaction(td, tr, transaction) {
   if (editing) return;
 
   editing = { tr, transaction };
@@ -283,9 +289,11 @@ function editTransaction(tr, transaction) {
       child.classList.add("editing");
     }
   }
+
+  setTimeout(() => td.focus(), 0);
 }
 
-function saveTransaction() {
+function saveTransaction(data) {
   if (!editing) return false;
 
   let errors = false;
@@ -324,5 +332,6 @@ function saveTransaction() {
 
   editing = undefined;
 
-  return true;
+  data.save();
+  View.display(data);
 }

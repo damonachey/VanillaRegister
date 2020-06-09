@@ -4,7 +4,9 @@ export const Utilities = {
   },
 
   validateDate(dateStr) {
-    const match = dateStr.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
+    const match = dateStr.match(
+      /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/
+    );
 
     if (!match) return false;
 
