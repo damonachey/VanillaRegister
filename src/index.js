@@ -7,4 +7,4 @@ Data.initialize();
 Data.load();
 
 View.initialize("app", Data);
-View.display(Data);
+View.display();

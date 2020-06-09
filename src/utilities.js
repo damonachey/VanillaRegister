@@ -3,6 +3,15 @@ export const Utilities = {
     return currency.format(value);
   },
 
+  today() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const MM = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+
+    return `${yyyy}-${MM}-${dd}`;
+  },
+
   validateDate(dateStr) {
     const match = dateStr.match(
       /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/

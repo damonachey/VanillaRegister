@@ -2,75 +2,51 @@
   display: flex;
 }
 
-.accounts {
-  padding: 10px 20px 0px 0px;
+h3 {
+  margin: 5px;
 }
 
-.accountList {
+ul {
   list-style-type: none;
-  padding: 0;
-  color: #4f81bd;
+  padding: 0px 10px;
 }
 
-.accountList li {
+li {
   padding-bottom: 5px;
   white-space: nowrap;
 }
 
-.accountList li[selected="true"] {
+li.selected {
   font-weight: bold;
-}
-
-.transactions {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid grey;
-}
-
-.transactionList {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transactionList thead,
-.transactionList tfoot {
-  color: #fff;
-  background: #4f81bd;
-  text-align: left;
-}
-
-.transactionList th,
-.transactionList td {
-  padding: 5px;
-  border: 1px solid #95b3d7;
-}
-
-.transactionList td[name="Amount"],
-.transactionList td[name="Balance"] {
-  text-align: right;
 }
 
 .clickable {
   cursor: pointer;
 }
 
-.transactionList tr:nth-child(even) {
-  background: #dbe5f0;
+.accountName {
+  color: #4f81bd;
 }
 
-.transactionList tr.future {
-  color: #999;
+.accounts {
+  padding: 10px 10px;
 }
 
-.editing {
-  background: #66ff66;
+.transactions {
+  width: 100%;
+  padding: 10px 10px;
+  border: 1px solid grey;
 }
 
-.error {
-  background: #ff6666;
+.transactionTable {
+  width: 100%;
 }
 
-.manage {
+.future {
+  color: #777;
+}
+
+.management {
   margin: 20px;
   text-align: center;
 }
@@ -86,10 +62,41 @@
   font-size: 16px;
 }
 
+.editing {
+  background: #66ff66;
+}
+
 .warning {
   background-color: #ff6700;
 }
 
-a {
-  text-decoration: none;
+.error {
+  background: #ff6666;
+}
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+thead,
+tfoot {
+  color: #fff;
+  background: #4f81bd;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 5px;
+  border: 1px solid #95b3d7;
+}
+
+td[property="amount"],
+td[property="balance"] {
+  text-align: right;
+}
+
+tr:nth-child(even) {
+  background: #dbe5f0;
 }
