@@ -139,24 +139,24 @@ function populateTransactions(app, data) {
     tableBody.appendChild(tr);
   }
 
-  const row = document.createElement("tr");
+  const tr = document.createElement("tr");
 
-  row.innerHTML = `
+  tr.innerHTML = `
       ${formatTransactionTDs(data, {})}
       <td class="clickable newable" style="font-weight: 900;">🗋</td>
     `;
 
-  for (const child of row.children) {
+  for (const child of tr.children) {
     if (child.classList.contains("editable")) {
-      child.ondblclick = () => editTransaction(data, row, child);
+      child.ondblclick = () => editTransaction(data, tr, child);
     }
 
     if (child.classList.contains("newable")) {
-      child.onclick = () => editTransaction(data, row);
+      child.onclick = () => editTransaction(data, tr);
     }
   }
 
-  tableBody.appendChild(row);
+  tableBody.appendChild(tr);
 }
 
 function formatTransaction(data, transaction, balances) {
@@ -280,9 +280,13 @@ function editTransaction(data, row, field, transaction) {
   for (const child of row.children) {
     if (child.classList.contains("editable")) {
       const property = child.getAttribute("property");
+
       if (property === "date" && child.textContent === "") {
         child.textContent = Utilities.today();
+      } else if (property === "payee") {
+        // TODO: add datalist here
       }
+
       child.setAttribute("contenteditable", true);
       child.classList.add("editing");
     }
