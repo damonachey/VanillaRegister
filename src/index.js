@@ -1,5 +1,3 @@
-import "./index.css";
-
 import { Data } from "./data.js";
 import { View } from "./view.js";
 

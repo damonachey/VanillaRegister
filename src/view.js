@@ -1,6 +1,4 @@
-import "./view.css";
-
-import { Utilities } from "./utilities";
+import { Utilities } from "./utilities.js";
 
 export const View = {
   initialize(name, data) {
